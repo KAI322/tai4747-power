@@ -6,8 +6,19 @@
   <title id="pageTitle">個人專屬 · 台電職員考題大師 iOS 26.6 旗艦網站</title>
   <!-- KaTeX for math formula rendering -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css"></script>
+  <!-- KaTeX CSS loaded above. -->
   <link rel="stylesheet" href="css/style.css">
+
+  <meta name="theme-color" content="#070913">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="台電考題大師">
+  <meta name="application-name" content="台電考題大師">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
 </head>
 <body class="ios26-theme">
 
@@ -109,5 +120,15 @@
 
   <script src="js/examData.js"></script>
   <script src="js/app.js"></script>
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(err => {
+          console.warn("PWA Service Worker registration failed:", err);
+        });
+      });
+    }
+  </script>
 </body>
 </html>
