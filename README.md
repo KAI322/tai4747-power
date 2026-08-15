@@ -1,50 +1,31 @@
-# 台電職員電機｜歷屆試題詳解刷題網站（GitHub Pages 版）
+# 台電職員電機｜歷屆試題刷題與模擬考
 
-這是可直接部署到 GitHub Pages 的純前端版本，不需要 Node.js、資料庫或伺服器。
+GitHub Pages 純前端版，不需要後端或資料庫。
 
 ## 功能
 
-- 108～114 年科目 A 題庫，共 350 題
-- 108～112 年題目依題本內答案標記提供自動判分
-- 年度、主題、作答狀態與關鍵字篩選
-- 隨機刷題
-- 錯題與收藏
-- localStorage 保存個人作答進度
-- 手機／桌面自適應
+- 108–114 年科目 A 題庫瀏覽
+- 年度、章節、錯題、收藏、關鍵字篩選
+- 一般刷題即時判分
+- 50 題／90 分鐘模擬考
+- 模擬考倒數計時
+- 50 題跳題盤
+- 歷次模擬考成績圖表
+- 章節弱點分析
+- 錯題逐題檢討與公式／易錯點提示
+- localStorage 自動保存進度與成績
 
-## 公開版差異
+## 部署 GitHub Pages
 
-本版本不附原始歷屆試題 PDF，以降低公開 repository 夾帶整份試卷檔案的需求。
-部分題目在原卷含電路圖、波形或示意圖，純文字題庫可能無法完整呈現，請搭配合法取得的原始試題閱讀。
+1. 建立 GitHub repository。
+2. 將本資料夾所有檔案上傳到 repository 根目錄。
+3. GitHub repository → `Settings` → `Pages`。
+4. Source 選 `Deploy from a branch`。
+5. Branch 選 `main`，資料夾選 `/ (root)`。
+6. 儲存後即可取得 `https://帳號.github.io/repository名稱/`。
 
-## GitHub Pages 部署
+## 題庫說明
 
-1. 建立一個新的 GitHub repository，例如 `taipower-exam-quiz`。
-2. 將本資料夾內所有檔案上傳到 repository 根目錄。
-3. 到 `Settings` → `Pages`。
-4. `Source` 選擇 `Deploy from a branch`。
-5. Branch 選 `main`，Folder 選 `/ (root)`。
-6. 儲存後即可由 GitHub Pages 網址開啟。
+公開版不附原始 PDF。部分題目含圖形，純文字抽取可能不足以完整還原原題。113、114 年尚未有答案資料的題目不會納入自動判分及模擬考。
 
-典型網址：
-
-```text
-https://YOUR-USERNAME.github.io/taipower-exam-quiz/
-```
-
-## 檔案結構
-
-```text
-.
-├── index.html
-├── style.css
-├── app.js
-├── data.js
-├── .nojekyll
-├── 404.html
-└── README.md
-```
-
-## 題庫資料
-
-題庫位於 `data.js`，前端程式位於 `app.js`。如果之後取得 113、114 年核對過的正式答案，可直接補進題庫資料結構，不需要改網站架構。
+「詳解」目前以題庫內既有解題核心，搭配章節公式與常見失分點呈現；對於高度依賴原圖的電路題，建議仍搭配合法取得的原始試題閱讀。

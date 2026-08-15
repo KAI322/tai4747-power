@@ -1,1 +1,72 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>台電職員電機｜歷屆試題詳解刷題</title><link rel="stylesheet" href="style.css"></head><body><header class="top"><div class="wrap"><h1>⚡ 台電職員電機｜歷屆試題詳解刷題</h1><p>108–114 年科目 A 題庫｜自動判分・錯題收藏・進度保存｜GitHub Pages 公開版</p></div></header><main class="wrap"><div class="stats"><div class="stat"><b id="sTotal">0</b><span>目前題數</span></div><div class="stat"><b id="sDone">0</b><span>已作答</span></div><div class="stat"><b id="sRate">—</b><span>答對率</span></div><div class="stat"><b id="sFav">0</b><span>收藏／錯題</span></div></div><div class="grid"><aside class="panel"><h3>刷題設定</h3><div class="control"><label>年度</label><select id="year"><option value="all">全部</option></select></div><div class="control"><label>主題</label><select id="topic"><option value="all">全部</option></select></div><div class="control"><label>題目狀態</label><select id="status"><option value="all">全部題目</option><option value="unanswered">尚未作答</option><option value="wrong">錯題</option><option value="favorite">收藏</option><option value="answered">已作答</option></select></div><div class="control"><label>搜尋題目</label><input id="search" placeholder="例如：功率因數、MOSFET"></div><button class="btn secondary" id="random">🎲 隨機一題</button><button class="btn secondary" id="reset" style="margin-top:8px">↺ 清除本機進度</button><div class="small" style="margin-top:14px">進度只儲存在你的瀏覽器 localStorage，不會上傳。</div></aside><section><div id="quiz"></div><section class="papers"><h2>📚 題庫來源說明</h2><div class="source-note"><b>GitHub Pages 公開版不附原始 PDF。</b><br>部分題目原卷含電路圖或示意圖，純文字版可能無法完整呈現；遇到圖形題時，請搭配你合法取得的原始歷屆試題閱讀。</div></section></section></div></main><script src="data.js"></script><script src="app.js"></script></body></html>
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>台電職員電機｜歷屆試題刷題與模擬考</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap topbar">
+    <div><h1>⚡ 台電職員電機｜歷屆試題刷題</h1><p>108–114 年科目 A｜刷題・50 題模擬考・弱點分析・成績追蹤</p></div>
+    <div class="timer hidden" id="timer">90:00</div>
+  </div>
+</header>
+<nav class="tabs wrap" aria-label="功能切換">
+  <button class="tab active" data-view="practice">📘 一般刷題</button>
+  <button class="tab" data-view="exam">⏱️ 50 題模擬考</button>
+  <button class="tab" data-view="analysis">📊 成績與弱點</button>
+</nav>
+<main class="wrap">
+  <section id="practiceView" class="view active">
+    <div class="stats">
+      <div class="stat"><b id="sTotal">0</b><span>目前題數</span></div>
+      <div class="stat"><b id="sDone">0</b><span>已作答</span></div>
+      <div class="stat"><b id="sRate">—</b><span>答對率</span></div>
+      <div class="stat"><b id="sFav">0</b><span>收藏／錯題</span></div>
+    </div>
+    <div class="grid">
+      <aside class="panel">
+        <h3>刷題設定</h3>
+        <div class="control"><label>年度</label><select id="year"><option value="all">全部</option></select></div>
+        <div class="control"><label>主題</label><select id="topic"><option value="all">全部</option></select></div>
+        <div class="control"><label>題目狀態</label><select id="status"><option value="all">全部題目</option><option value="unanswered">尚未作答</option><option value="wrong">錯題</option><option value="favorite">收藏</option><option value="answered">已作答</option></select></div>
+        <div class="control"><label>搜尋題目</label><input id="search" placeholder="例如：功率因數、MOSFET"></div>
+        <button class="btn secondary full" id="random">🎲 隨機一題</button>
+        <button class="btn secondary full" id="reset">↺ 清除本機進度</button>
+        <div class="small">進度只儲存在你的瀏覽器 localStorage，不會上傳。</div>
+      </aside>
+      <section><div id="quiz"></div></section>
+    </div>
+  </section>
+
+  <section id="examView" class="view">
+    <div id="examSetup" class="card exam-setup">
+      <h2>⏱️ 科目 A｜50 題模擬考</h2>
+      <p>從目前已有答案可自動判分的歷屆題目中隨機抽取 50 題，限時 90 分鐘。考試期間不顯示正確答案；交卷後才提供成績、逐題檢討與弱點分析。</p>
+      <div class="exam-rules"><span>50 題</span><span>90 分鐘</span><span>每題 2 分</span><span>滿分 100</span></div>
+      <button class="btn primary big" id="startExam">開始模擬考</button>
+    </div>
+    <div id="examDesk" class="hidden">
+      <div class="exam-layout">
+        <section id="examQuestion"></section>
+        <aside class="panel navigator"><h3>題目跳題盤</h3><div id="navGrid" class="navgrid"></div><div class="navlegend"><span><i class="dot answered"></i>已作答</span><span><i class="dot current"></i>目前</span></div><button class="btn danger full" id="submitExam">交卷</button></aside>
+      </div>
+    </div>
+    <div id="examResult" class="hidden"></div>
+  </section>
+
+  <section id="analysisView" class="view">
+    <div class="analytics-grid">
+      <article class="card"><h2>📈 歷次模擬考成績</h2><canvas id="scoreChart" width="760" height="300"></canvas><div id="scoreEmpty" class="empty hidden">尚未完成模擬考。</div></article>
+      <article class="card"><h2>🎯 章節弱點分析</h2><div id="weakness"></div></article>
+    </div>
+    <article class="card"><h2>🧾 模擬考紀錄</h2><div id="history"></div></article>
+  </section>
+
+  <section class="papers card source-card"><h2>📚 題庫來源說明</h2><p><b>GitHub Pages 公開版不附原始 PDF。</b>部分題目原卷含電路圖或示意圖，純文字版可能無法完整呈現。113、114 年若尚未匯入官方答案，題目可練習但不會納入自動判分與模擬考。</p></section>
+</main>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body></html>
