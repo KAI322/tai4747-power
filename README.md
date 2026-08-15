@@ -15,4 +15,17 @@ GitHub Pages 純前端版，不需要後端或資料庫。
 - 錯題逐題檢討與公式／易錯點提示
 - localStorage 自動保存進度與成績
 
+## 部署 GitHub Pages
 
+1. 建立 GitHub repository。
+2. 將本資料夾所有檔案上傳到 repository 根目錄。
+3. GitHub repository → `Settings` → `Pages`。
+4. Source 選 `Deploy from a branch`。
+5. Branch 選 `main`，資料夾選 `/ (root)`。
+6. 儲存後即可取得 `https://帳號.github.io/repository名稱/`。
+
+## 題庫說明
+
+公開版不附原始 PDF。部分題目含圖形，純文字抽取可能不足以完整還原原題。113、114 年尚未有答案資料的題目不會納入自動判分及模擬考。
+
+「詳解」目前以題庫內既有解題核心，搭配章節公式與常見失分點呈現；對於高度依賴原圖的電路題，建議仍搭配合法取得的原始試題閱讀。

@@ -1,5 +1,5 @@
 const Q=window.QUESTION_BANK||[];
-const LS='taipowerQuizV2';
+const LS='taipowerQuizV3';
 let state=JSON.parse(localStorage.getItem(LS)||'{"answers":{},"favorite":{},"examHistory":[]}');
 state.answers=state.answers||{}; state.favorite=state.favorite||{}; state.examHistory=state.examHistory||[];
 let list=[],idx=0,selected=null,shown=false;
@@ -8,21 +8,44 @@ const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const save=()=>localStorage.setItem(LS,JSON.stringify(state));
 const esc=s=>String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function groupOf(topic=''){if(/三相|功率/.test(topic))return 'threephase'; if(/運算放大器|OP/.test(topic))return 'opamp'; if(/電容|電感|暫態/.test(topic))return 'transient'; if(/BJT|MOSFET|二極體/.test(topic))return 'semiconductor'; if(/拉普拉斯/.test(topic))return 'laplace'; if(/戴維寧/.test(topic))return 'thevenin'; return 'basic';}
 function formula(topic){const m={
- '三相交流':'三相常用：Y 接 V相=V線/√3、I線=I相；Δ 接 V線=V相、I線=√3 I相，並注意 ±30° 相位。',
- '戴維寧等效':'戴維寧：Vth=開路端電壓；Zth=關閉獨立源後由端點看入之等效阻抗。',
- '運算放大器':'理想 OP Amp 負回授：i+=i−=0、V+=V−，再以 KCL 解節點。',
- '電容/暫態':'電容 i=C·dv/dt，電容電壓不可瞬變；一階響應 x(t)=x(∞)+[x(0+)-x(∞)]e^(−t/τ)。',
- '電感/暫態':'電感 v=L·di/dt，電感電流不可瞬變；RL 時常數 τ=L/Rth。',
- '功率因數':'P=S cosφ、Q=S sinφ、Q=P tanφ；補償電容提供超前無功。',
- '拉普拉斯':'L{sin at}=a/(s²+a²)，L{cos at}=s/(s²+a²)，搭配線性與位移性質。',
- 'BJT':'主動區常用 Ic≈βIb、Ie=Ic+Ib；矽 BJT 可先以 VBE≈0.7 V 判斷偏壓。',
- 'MOSFET':'先判斷截止／三極／飽和區，再選對應 I_D 方程；小訊號常用 gm。',
- '二極體':'先判斷導通/截止；矽二極體定壓降模型常取約 0.7 V。',
- '電阻電路':'優先用歐姆定律 V=IR、KCL、KVL 與串並聯等效化簡。'
-}; return m[topic]||'先辨識題型與已知條件，列出控制方程，再代入數值並檢查單位、相位與答案量級。'}
-function pitfall(topic){if(/三相|功率/.test(topic))return '常見失分：線量與相量混用、忽略 √3 或相位方向。';if(/暫態|電容|電感/.test(topic))return '常見失分：忘記 t=0⁻ 與 t=0⁺ 的連續條件，或時常數取錯等效電阻。';if(/BJT|MOSFET|二極體/.test(topic))return '常見失分：未先確認元件操作區域，就直接套用公式。';return '常見失分：太早代數字、符號方向未先定義，或忽略題目單位。'}
-function detail(q){return `<div class="solution"><h4>① 解題核心</h4><div>${esc(q.explanation)}</div><h4>② 建議公式／方法</h4><div>${esc(formula(q.topic))}</div><h4>③ 作答檢查</h4><div>${esc(pitfall(q.topic))}</div></div>`}
+ 'threephase':'Y 接：V相=V線/√3、I線=I相；Δ 接：V線=V相、I線=√3I相；功率 P=√3V_LI_Lcosφ。',
+ 'opamp':'理想 OP Amp 負回授：i+=i−=0、V+=V−；用 KCL/KVL 找關係，再求 Vo。',
+ 'transient':'電容 i=C·dv/dt、電感 v=L·di/dt；一階響應 x(t)=x(∞)+[x(0+)-x(∞)]e^(−t/τ)。',
+ 'semiconductor':'先判斷導通區／飽和區／截止區，再套對應方程；BJT 常用 VBE≈0.7 V。',
+ 'laplace':'L{sin at}=a/(s²+a²)、L{cos at}=s/(s²+a²)，位移與線性性質要一起用。',
+ 'thevenin':'Vth=開路端電壓；Zth=獨立源關掉後由端點看入的等效阻抗。',
+ 'basic':'優先用歐姆定律、KCL、KVL，先化簡電路再代數值。'
+}; return m[groupOf(topic)]}
+function pitfall(topic){const m={
+ 'threephase':'線量與相量容易混用，也常忘記 √3 與相位 ±30°。',
+ 'opamp':'忘記先確認是否為負回授，或把虛短路誤用在不成立的情況。',
+ 'transient':'t=0⁻ 與 t=0⁺ 連續條件、時常數 Rth 常是失分點。',
+ 'semiconductor':'沒有先判斷元件工作區域，就直接代公式。',
+ 'laplace':'正弦、餘弦對應式寫反，或忽略位移項 e^{-as}。',
+ 'thevenin':'關閉獨立源時，電壓源短路、電流源開路，常常搞反。',
+ 'basic':'符號方向、單位換算、串並聯等效順序要先確認。'
+}; return m[groupOf(topic)]}
+function visualCaption(topic){const m={
+ 'threephase':'用小圖快速記住 Y/Δ、相量與三相功率關係。',
+ 'opamp':'以三角形 OP 模型整理輸入端、輸出端與回授概念。',
+ 'transient':'把暫態曲線與元件連續性放在一起看最容易理解。',
+ 'semiconductor':'先辨識元件，再判斷操作區與基本方程。',
+ 'laplace':'把時域訊號轉到 s 域，常用表格與位移觀念一起記。',
+ 'thevenin':'先化簡成等效源，再回來求負載端電壓或電流。',
+ 'basic':'先用基本電路定律，把整體關係寫清楚。'
+}; return m[groupOf(topic)]}
+function topicSvg(topic){switch(groupOf(topic)){
+ case 'threephase': return `<svg viewBox="0 0 170 120" aria-hidden="true"><rect x="8" y="8" width="154" height="104" rx="14" fill="#f7fbfe" stroke="#d7ebf7"/><circle cx="42" cy="36" r="8" fill="#0ea5e9"/><circle cx="30" cy="58" r="8" fill="#38bdf8"/><circle cx="54" cy="58" r="8" fill="#075985"/><path d="M42 36v30M30 58h24" stroke="#075985" stroke-width="4" stroke-linecap="round"/><path d="M102 31l24 40H78z" fill="none" stroke="#0ea5e9" stroke-width="4"/><text x="18" y="90" font-size="11" fill="#0f172a">Y 接</text><text x="92" y="90" font-size="11" fill="#0f172a">Δ 接</text><text x="18" y="103" font-size="10" fill="#64748b">P=√3VLI Lcosφ</text></svg>`;
+ case 'opamp': return `<svg viewBox="0 0 170 120" aria-hidden="true"><rect x="8" y="8" width="154" height="104" rx="14" fill="#f7fbfe" stroke="#d7ebf7"/><path d="M54 28l56 32-56 32z" fill="#e0f2fe" stroke="#075985" stroke-width="3"/><path d="M24 46h30M24 74h30M110 60h34" stroke="#075985" stroke-width="3" stroke-linecap="round"/><path d="M130 60V32H86" fill="none" stroke="#0ea5e9" stroke-width="3"/><text x="31" y="43" font-size="12" fill="#0f172a">+</text><text x="31" y="82" font-size="12" fill="#0f172a">−</text><text x="116" y="54" font-size="10" fill="#64748b">Vo</text></svg>`;
+ case 'transient': return `<svg viewBox="0 0 170 120" aria-hidden="true"><rect x="8" y="8" width="154" height="104" rx="14" fill="#f7fbfe" stroke="#d7ebf7"/><path d="M26 90H148M34 98V24" stroke="#94a3b8" stroke-width="2"/><path d="M38 82c20 0 18-44 36-44 18 0 12 36 34 36 12 0 17-9 30-9" fill="none" stroke="#0ea5e9" stroke-width="4" stroke-linecap="round"/><text x="42" y="28" font-size="10" fill="#64748b">x(t)</text><text x="142" y="102" font-size="10" fill="#64748b">t</text><text x="47" y="108" font-size="10" fill="#0f172a">τ</text></svg>`;
+ case 'semiconductor': return `<svg viewBox="0 0 170 120" aria-hidden="true"><rect x="8" y="8" width="154" height="104" rx="14" fill="#f7fbfe" stroke="#d7ebf7"/><path d="M44 24v72M44 60h28M72 40v40M72 40l24-10M72 80l24 10" stroke="#075985" stroke-width="3" stroke-linecap="round"/><path d="M104 49l18 0M104 71l18 0" stroke="#0ea5e9" stroke-width="3"/><text x="24" y="20" font-size="10" fill="#64748b">B</text><text x="95" y="40" font-size="10" fill="#64748b">C</text><text x="95" y="86" font-size="10" fill="#64748b">E</text><path d="M87 76l8 6-1-10" fill="#0ea5e9"/></svg>`;
+ case 'laplace': return `<svg viewBox="0 0 170 120" aria-hidden="true"><rect x="8" y="8" width="154" height="104" rx="14" fill="#f7fbfe" stroke="#d7ebf7"/><path d="M26 84c10-32 20-52 34-52s12 28 22 28 10-18 18-18 10 13 20 13" fill="none" stroke="#0ea5e9" stroke-width="4" stroke-linecap="round"/><path d="M72 95h28" stroke="#075985" stroke-width="3"/><path d="M98 95l-8-6M98 95l-8 6" stroke="#075985" stroke-width="3"/><text x="18" y="103" font-size="10" fill="#64748b">time domain</text><text x="102" y="103" font-size="10" fill="#64748b">s-domain</text><text x="108" y="56" font-size="13" fill="#0f172a">F(s)</text></svg>`;
+ case 'thevenin': return `<svg viewBox="0 0 170 120" aria-hidden="true"><rect x="8" y="8" width="154" height="104" rx="14" fill="#f7fbfe" stroke="#d7ebf7"/><circle cx="42" cy="60" r="16" fill="#e0f2fe" stroke="#075985" stroke-width="3"/><path d="M42 50v20M32 60h20" stroke="#075985" stroke-width="3"/><path d="M58 60h26M84 44v32M94 46l12 0M94 54l12 0M94 62l12 0M94 70l12 0" stroke="#0ea5e9" stroke-width="3" stroke-linecap="round"/><path d="M106 60h24" stroke="#075985" stroke-width="3"/><text x="20" y="90" font-size="10" fill="#64748b">Vth</text><text x="92" y="88" font-size="10" fill="#64748b">Rth</text></svg>`;
+ default: return `<svg viewBox="0 0 170 120" aria-hidden="true"><rect x="8" y="8" width="154" height="104" rx="14" fill="#f7fbfe" stroke="#d7ebf7"/><path d="M26 40h22l8-10 12 20 12-20 12 20 8-10h22" fill="none" stroke="#0ea5e9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M26 80h22M108 80h36" stroke="#075985" stroke-width="4" stroke-linecap="round"/><circle cx="80" cy="80" r="14" fill="#e0f2fe" stroke="#075985" stroke-width="3"/><text x="74" y="85" font-size="12" fill="#0f172a">A</text></svg>`;
+ }}
+function detail(q){return `<div class="rich-solution"><div class="visual-wrap">${topicSvg(q.topic)}<div><h4>📷 圖解觀念</h4><p class="visual-caption">${esc(visualCaption(q.topic))}</p></div></div><div class="info-grid"><div class="info-box"><h4>① 解題核心</h4><p>${esc(q.explanation)}</p></div><div class="info-box"><h4>② 建議公式／方法</h4><p>${esc(formula(q.topic))}</p></div><div class="info-box"><h4>③ 作答檢查</h4><p>${esc(pitfall(q.topic))}</p></div></div></div>`}
 function init(){
  [...new Set(Q.map(q=>q.year))].sort().forEach(y=>$('#year').add(new Option(y+' 年',y)));
  [...new Set(Q.map(q=>q.topic))].sort().forEach(t=>$('#topic').add(new Option(t,t)));
@@ -31,7 +54,16 @@ function init(){
  $('#reset').onclick=()=>{if(confirm('確定清除所有一般刷題紀錄、收藏與模擬考成績？')){state={answers:{},favorite:{},examHistory:[]};save();filter();renderAnalysis()}};
  $$('.tab').forEach(b=>b.onclick=()=>switchView(b.dataset.view));
  $('#startExam').onclick=startExam; $('#submitExam').onclick=()=>finishExam(false);
- filter(); renderAnalysis();
+ renderTopicStrip(); filter(); renderAnalysis();
+}
+function renderTopicStrip(){
+ const items=[
+  ['🔌','電阻電路','KCL、KVL、串並聯與歐姆定律，是所有題型的基礎。'],
+  ['📐','三相交流','Y/Δ、相量、功率因數與三相功率是常見大宗題型。'],
+  ['📉','拉普拉斯／暫態','善用標準轉換表與一階響應公式，速度會快很多。'],
+  ['🔬','半導體','BJT、MOSFET、二極體先判斷工作區，再代公式。']
+ ];
+ $('#topicStrip').innerHTML=items.map(([i,t,d])=>`<article class="card topic-card"><div class="topic-card-head"><div class="topic-icon">${i}</div><div><b>${t}</b></div></div><p>${d}</p></article>`).join('');
 }
 function switchView(v){$$('.tab').forEach(b=>b.classList.toggle('active',b.dataset.view===v));$$('.view').forEach(x=>x.classList.remove('active'));$('#'+v+'View').classList.add('active');if(v==='analysis')renderAnalysis()}
 function filter(){let y=$('#year').value,t=$('#topic').value,s=$('#status').value,k=$('#search').value.trim().toLowerCase();list=Q.filter(q=>(y==='all'||String(q.year)===y)&&(t==='all'||q.topic===t)&&(!k||q.text.toLowerCase().includes(k)||q.topic.toLowerCase().includes(k)));if(s!=='all')list=list.filter(q=>{let a=state.answers[q.id],f=state.favorite[q.id];if(s==='unanswered')return !a;if(s==='answered')return !!a;if(s==='wrong')return a&&q.answer&&a.choice!==q.answer;if(s==='favorite')return !!f});idx=0;selected=null;shown=false;renderPractice();stats()}
